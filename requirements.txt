@@ -1,0 +1,12 @@
+openai
+flask
+flask-cors
+azure-cosmos
+azure-identity==1.16.0
+IPython
+markupsafe
+escape
+requests
+pandas
+scikit-learn
+pypdf
