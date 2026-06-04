@@ -8,7 +8,6 @@ from flask_cors import CORS, cross_origin
 
 from markupsafe import escape
 
-import InternalModules.ChatApplication.ProblemSummaryChatCompletion as ProblemSummaryChatCompletion
 import InternalModules.RagApplication.ChatCompletion_RAG as ChatCompletion_RAG
 
 app = Flask(__name__)
