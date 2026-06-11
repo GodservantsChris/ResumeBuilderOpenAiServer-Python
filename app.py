@@ -49,14 +49,16 @@ def chat():
                if chat_results.text:
                   emsgOperation = f"converting the chat_results.text to an object"
                   chat_results_obj = json.loads(chat_results.text)
+                  if chat_results_obj is None:
+                     raise Exception( f"chat_results_obj is empty." )
                else:
-                  raise Exception( f"The return content is empty." )
+                  raise Exception( f"chat_results.text is empty." )
             else:
-               raise Exception( f"The return content is empty." )
+               raise Exception( f"chat_results is empty." )
          else:
-            raise Exception( f"The return content is empty." )
+            raise Exception( f"input_user is empty." )
       else:
-         raise Exception( f"The return content is empty." )
+         raise Exception( f"request.json is empty." )
    except Exception as e:
       chat_results_obj = f"Exception in " + emsgContext + f" while " + emsgOperation + f": " + str({e})
    finally:      
