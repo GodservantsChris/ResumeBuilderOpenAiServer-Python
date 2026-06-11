@@ -73,5 +73,12 @@ def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'),
                                'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
+@app.get("/debug-env")
+def debug_env():
+    return {
+        "AZURE_OPENAI_API_KEY": os.environ.get("AZURE_OPENAI_API_KEY"),
+        "all_vars": list(os.environ.keys())
+    }
+
 if __name__ == '__main__':
    app.run()
