@@ -41,7 +41,7 @@ def GetContextUsingInputAndCompleteChat(user_input, nearest_neighbors_estimator,
             #
             return response 
         else:
-            raise NameError         
+            raise NameError(f'user_input is None.')        
 
     except NameError as e:
         emsg = (f'NameError Exception ' + emsgOperation + ' ' + emsgContext + f': ' + repr(e))
@@ -71,9 +71,9 @@ def CreateContextAndUseInputThenCompleteChat(user_input):
             if response_chat:
                 return response_chat
             else:
-                raise NameError 
+                raise NameError(f'resonse_chat is None.')
         else:
-            raise NameError  
+            raise NameError(f'user_input is None.')  
 
     except NameError as e:
         emsg = (f'NameError Exception ' + emsgOperation + ' ' + emsgContext + f': ' + repr(e))
