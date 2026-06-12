@@ -39,15 +39,18 @@ def GetContextUsingInputAndCompleteChat(user_input, nearest_neighbors_estimator,
             print(f"messages = " + json.dumps(messages))
             response = AzureAiClient.GetClientAndCompleteChat(messages, 0.7, withRawResponse = True)
             #
-        if user_input is None:
-            raise NameError  
+            return response 
+        else:
+            raise NameError         
 
     except NameError as e:
-        print(f'NameError Exception ' + emsgOperation + ' ' + emsgContext + f': ' + repr(e))
+        emsg = (f'NameError Exception ' + emsgOperation + ' ' + emsgContext + f': ' + repr(e))
+        raise Exception(emsg)
+
     except Exception as e:
-        print(f'Exception ' + emsgOperation + f' ' + emsgContext + f': ' + repr(e))
-    finally:
-        return response
+        emsg = (f'Exception ' + emsgOperation + f' ' + emsgContext + f': ' + repr(e))
+        raise Exception(emsg)
+        
 
 def CreateContextAndUseInputThenCompleteChat(user_input):
     response_chat = None
@@ -65,14 +68,17 @@ def CreateContextAndUseInputThenCompleteChat(user_input):
                 response_chat = GetContextUsingInputAndCompleteChat(user_input, values[0], values[1])
             else:
                 response_chat = GetContextUsingInputAndCompleteChat(user_input, None, None) 
-            if response_chat is None:
+            if response_chat:
+                return response_chat
+            else:
                 raise NameError 
-        if user_input is None:
+        else:
             raise NameError  
 
     except NameError as e:
-        print(f'NameError Exception ' + emsgOperation + ' ' + emsgContext + f': ' + repr(e))
+        emsg = (f'NameError Exception ' + emsgOperation + ' ' + emsgContext + f': ' + repr(e))
+        raise Exception(emsg)
     except Exception as e:
-        print(f'Exception ' + emsgOperation + f' ' + emsgContext + f': ' + repr(e))
-    finally:
-        return response_chat
+        emsg = (f'Exception ' + emsgOperation + f' ' + emsgContext + f': ' + repr(e))
+        raise Exception(emsg)
+        
