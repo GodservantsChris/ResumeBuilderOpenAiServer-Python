@@ -39,7 +39,7 @@ def GetContextUsingInputAndCompleteChat(user_input, nearest_neighbors_estimator,
                 {"role": "user", "content": user_input}
             ]
             strMessages = json.dumps(messages)
-            emsgOperation = f'getting the client and completing the chat using messages = '# + strMessages
+            emsgOperation = f'getting the client and completing the chat using messages = ' + strMessages
             response = AzureAiClient.GetClientAndCompleteChat(messages, 0.7, withRawResponse = True)
             if response:
                 return response    
