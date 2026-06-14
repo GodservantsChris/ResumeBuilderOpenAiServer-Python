@@ -57,21 +57,26 @@ def CreateContextAndUseInputThenCompleteChat(user_input):
     emsgContext = f'in ChatCompletion_RAG.py.CreateContextAndUseInputThenCompleteChat(...)'
     emsgOperation = f''
     try:
+        emsgOperation = f'validating user_input'
         if user_input:
             ## Convert the files to embeddings, etc
+            emsgOperation = f'converting Data files to embeddings'
             values = RagApplication.convertDataFilesToEmbeddings()
             if values and (len(values) > 1):
                 """ flattened_df = values[1]
                 print(f"flattened_df['chunks'] = ")
                 print(flattened_df['chunks']) """
                 ## Use RAG method of generating a response
+                emsgOperation = f'getting the context and completing the chat with values from Data files'
                 response_chat = GetContextUsingInputAndCompleteChat(user_input, values[0], values[1])
             else:
+                emsgOperation = f'getting the context and completing the chat when no values were returned from Data files'
                 response_chat = GetContextUsingInputAndCompleteChat(user_input, None, None) 
+            emsgOperation = f'validating response_chat'
             if response_chat:
                 return response_chat
             else:
-                raise NameError(f'resonse_chat is None.')
+                raise NameError(f'response_chat is None.')
         else:
             raise NameError(f'user_input is None.')  
 
