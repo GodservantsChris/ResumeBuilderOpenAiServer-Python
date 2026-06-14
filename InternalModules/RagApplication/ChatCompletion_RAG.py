@@ -28,8 +28,6 @@ def GetContextUsingInputAndCompleteChat(user_input, nearest_neighbors_estimator,
                         """ print(f"context_embeddings_dataframe['chunks'].iloc[" + str(index) + "] = " + chunk)
                         print(f" ") """
                         system_content += chunk
-            else:
-                user_input = "No user input."
             
             # create a message object
             messages=[
