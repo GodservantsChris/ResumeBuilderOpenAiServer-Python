@@ -10,7 +10,7 @@ def GetContextUsingInputAndCompleteChat(user_input, nearest_neighbors_estimator,
     emsgOperation = f''
     try:
         system_content = f"You are an AI assiatant that helps with AI questions."
-        emsgOperation = f''
+        emsgOperation = f'validating user_input'
         if user_input:
             # Convert the question to a query vector
             emsgOperation = f'creating embeddings from user_input'
@@ -38,8 +38,8 @@ def GetContextUsingInputAndCompleteChat(user_input, nearest_neighbors_estimator,
                 {"role": "system", "content": system_content},
                 {"role": "user", "content": user_input}
             ]
-            strMessages = json.dumps(messages))
-            emsgOperation = f'getting the client and completing the chat using messages = ' + strMessages
+            #strMessages = json.dumps(messages))
+            emsgOperation = f'getting the client and completing the chat using messages = '# + strMessages
             response = AzureAiClient.GetClientAndCompleteChat(messages, 0.7, withRawResponse = True)
             if response:
                 return response    
