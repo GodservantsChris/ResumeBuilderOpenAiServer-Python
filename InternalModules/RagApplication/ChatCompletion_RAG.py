@@ -10,8 +10,10 @@ def GetContextUsingInputAndCompleteChat(user_input, nearest_neighbors_estimator,
     emsgOperation = f''
     try:
         system_content = f"You are an AI assiatant that helps with AI questions."
+        emsgOperation = f''
         if user_input:
             # Convert the question to a query vector
+            emsgOperation = f'creating embeddings from user_input'
             query_vector = AzureAiClient.CreateEmbeddings(user_input)
             if query_vector and nearest_neighbors_estimator and (context_embeddings_dataframe is not None):
                 # Find the most similar documents
@@ -19,8 +21,10 @@ def GetContextUsingInputAndCompleteChat(user_input, nearest_neighbors_estimator,
                 #       that is represented in the nearest_neighbors_estimator and context_embeddings_dataframe['chunks'] (also ['embeddings'])
                 #   'distances' - there is an item for each chunk (also embedding) with the distance
                 #           from the embedding indicated by the corresponding index in 'indices'
+                emsgOperation = f'getting indices using nearest_neighbors_estimator.kneighbors(query_vector from results of creating embeddings)'
                 distances, indices = nearest_neighbors_estimator.kneighbors([query_vector])
                 # add documents to query to provide context
+                emsgOperation = f'building additional information for system context from indices of embeddings'
                 if (indices is not None) and (len(indices) > 0):
                     system_content += f"; Additional Information - "
                     for index in indices[0]:
@@ -34,10 +38,13 @@ def GetContextUsingInputAndCompleteChat(user_input, nearest_neighbors_estimator,
                 {"role": "system", "content": system_content},
                 {"role": "user", "content": user_input}
             ]
-            print(f"messages = " + json.dumps(messages))
+            strMessages = json.dumps(messages))
+            emsgOperation = f'getting the client and completing the chat using messages = ' + strMessages
             response = AzureAiClient.GetClientAndCompleteChat(messages, 0.7, withRawResponse = True)
-            #
-            return response 
+            if response:
+                return response    
+            else:
+                raise NameError(f'response is None.')
         else:
             raise NameError(f'user_input is None.')        
 
