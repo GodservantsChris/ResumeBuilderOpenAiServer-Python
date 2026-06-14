@@ -72,7 +72,6 @@ def CreateContextAndUseInputThenCompleteChat(user_input):
             else:
                 emsgOperation = f'getting the context and completing the chat when no values were returned from Data files'
                 response_chat = GetContextUsingInputAndCompleteChat(user_input, None, None) 
-            emsgOperation = f'validating response_chat'
             if response_chat:
                 return response_chat
             else:
