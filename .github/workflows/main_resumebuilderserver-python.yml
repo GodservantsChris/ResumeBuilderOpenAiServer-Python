@@ -4,6 +4,9 @@
 
 name: Build and deploy Python app to Azure Web App - ResumeBuilderServer-Python
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 on:
   push:
     branches:
