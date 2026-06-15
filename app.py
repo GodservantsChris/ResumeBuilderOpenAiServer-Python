@@ -77,10 +77,43 @@ def favicon():
 
 @app.get("/debug-env")
 def debug_env():
-    return {
-        "AZURE_OPENAI_API_KEY": os.environ.get("AZURE_OPENAI_API_KEY"),
-        "all_vars": list(os.environ.keys())
-    }
+      import os
+      from openai import AzureOpenAI
+
+      endpoint = "https://resumebuilder-openairesource.openai.azure.com/"
+      model_name = "gpt-4.1"
+      deployment = "gpt-4.1"
+
+      emsgOperation = f"getting the AZURE_OPENAI_API_KEY environmental variable
+      subscription_key = os.getenv("AZURE_OPENAI_API_KEY")
+      api_version = "2024-12-01-preview"
+
+      client = AzureOpenAI(
+         api_version=api_version,
+         azure_endpoint=endpoint,
+         api_key=subscription_key,
+    )
+
+      response = client.chat.completions.create(
+         messages=[
+            {
+                  "role": "system",
+                  "content": "You are a helpful assistant.",
+            },
+            {
+                  "role": "user",
+                  "content": "I am going to Paris, what should I see?",
+          }
+         ],
+         max_completion_tokens=13107,
+         temperature=1.0,
+         top_p=1.0,
+         frequency_penalty=0.0,
+         presence_penalty=0.0,
+         model=deployment
+      )
+
+      return (response.choices[0].message.content)
 
 if __name__ == '__main__':
    app.run()
