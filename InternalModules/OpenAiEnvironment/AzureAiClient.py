@@ -26,14 +26,14 @@ def GetClient():
             api_version=version,
             azure_endpoint = endpoint, 
             api_key=key)
-        if client is None:
+        if client:
+            return client
+        else:
             raise NameError
     except NameError as e:
-        print(f'NameError Exception ' + emsgOperation + ' ' + emsgContext + f': ' + repr(e))
+        raise Exception(f'NameError Exception ' + emsgOperation + ' ' + emsgContext + f': ' + repr(e))
     except Exception as e:
-        print(f'Exception ' + emsgOperation + f' ' + emsgContext + f': ' + repr(e))
-    finally:
-        return client
+        raise Exception(f'Exception ' + emsgOperation + f' ' + emsgContext + f': ' + repr(e))
     
 def ChatCompletion(client, colMessages, temperature_level = None, 
                    functions_collection = None, function_call_arg = None,
@@ -59,6 +59,7 @@ def ChatCompletion(client, colMessages, temperature_level = None,
                 iMaxTokenRate = int(tokens_max)
                 emsgOperation = f"creating the chat completion using the client"
                 if withRawResponse: 
+                    emsgOperation += f" with raw response"
                     response = client.chat.completions.with_raw_response.create(
                         model=deployment_text,
                         temperature=fTemperature,
@@ -76,15 +77,16 @@ def ChatCompletion(client, colMessages, temperature_level = None,
                         functions=functions_collection,
                         function_call=function_call_arg
                     )
-                if response is None:
+                if response:
+                    return response
+                else:
                     raise NameError(f"The response object is None.")
             else: raise NameError
         else: raise NameError
     except NameError as e:
-        print(f'NameError Exception ' + emsgOperation + ' ' + emsgContext + f': ' + repr(e))
+        raise Exception(f'NameError Exception ' + emsgOperation + ' ' + emsgContext + f': ' + repr(e))
     except Exception as e:
-        print(f'Exception ' + emsgOperation + f' ' + emsgContext + f': ' + repr(e) )
-    return response
+        raise Exception(f'Exception ' + emsgOperation + f' ' + emsgContext + f': ' + repr(e) )
     
 def GetClientAndCompleteChat(colMessages, temperature_level, 
                              functions_collection = None, function_call_arg = None,
@@ -102,16 +104,16 @@ def GetClientAndCompleteChat(colMessages, temperature_level,
                 response = ChatCompletion(client, colMessages, temperature_level, 
                                           functions_collection, function_call_arg,
                                           withRawResponse)
-                if response is None:
+                if response:
+                    return response
+                else:
                     raise NameError
             else: raise NameError
         else: raise NameError
     except NameError as e:
-        print(f'NameError Exception ' + emsgOperation + ' ' + emsgContext + f': ' + repr(e))
+        raise Exception(f'NameError Exception ' + emsgOperation + ' ' + emsgContext + f': ' + repr(e))
     except Exception as e:
-        print(f'Exception ' + emsgOperation + f' ' + emsgContext + f': ' + repr(e) )
-    finally:
-        return response
+        raise Exception(f'Exception ' + emsgOperation + f' ' + emsgContext + f': ' + repr(e) )
 
 """
 GetClientAndCompleteChatWithFunction(...) currently only supports a functions_collection with one function item
@@ -172,7 +174,9 @@ def GetClientAndCompleteChatWithFunction(colMessages, temperature_level,
                                             emsgOperation = f're-running the chat completion'
                                             response_final = GetClientAndCompleteChat(colMessages, "0.0", functions_collection, "auto")
                                             emsgOperation = f'validating the final response'
-                                            if response_final is None:
+                                            if response_final:
+                                                return response_final
+                                            else:
                                                 raise NameError
                                         else: raise NameError
                                     else: raise NameError                                        
@@ -184,11 +188,9 @@ def GetClientAndCompleteChatWithFunction(colMessages, temperature_level,
             else: raise NameError
         else: raise NameError
     except NameError as e:
-        print(f'NameError Exception ' + emsgOperation + ' ' + emsgContext + f': ' + repr(e))
+        raise Exception(f'NameError Exception ' + emsgOperation + ' ' + emsgContext + f': ' + repr(e))
     except Exception as e:
-        print(f'Exception ' + emsgOperation + f' ' + emsgContext + f': ' + repr(e) )
-    finally:
-        return response_final
+        raise Exception(f'Exception ' + emsgOperation + f' ' + emsgContext + f': ' + repr(e) )
 
 """ Embeddings """   
 def CreateEmbeddings(text):
