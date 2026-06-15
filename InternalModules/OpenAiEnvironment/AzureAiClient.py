@@ -204,14 +204,14 @@ def CreateEmbeddings(text):
         deployment = os.getenv("AZURE_OPENAI_EMBEDDINGS_DEPLOYMENT")
         emsgOperation = f"creating the embeddings"
         embeddings = client.embeddings.create(input = text, model=deployment).data[0].embedding
-        if embeddings is None:
+        if embeddings:
+            return embeddings
+        else:
             raise NameError
     except NameError as e:
-        print(f'NameError Exception ' + emsgOperation + ' ' + emsgContext + f': ' + repr(e))
+        raise Exception(f'NameError Exception ' + emsgOperation + ' ' + emsgContext + f': ' + repr(e))
     except Exception as e:
-        print(f'Exception ' + emsgOperation + f' ' + emsgContext + f': ' + repr(e) )
-    finally:
-        return embeddings
+        raise Exception(f'Exception ' + emsgOperation + f' ' + emsgContext + f': ' + repr(e) )
 
 def CreateEmbedding(text, client, deployment):
     embedding = None
@@ -223,15 +223,15 @@ def CreateEmbedding(text, client, deployment):
         emsgOperation = f"validating the embeddings"
         if embeddings is not None:
             embedding = embeddings.data[0].embedding
-            if embedding is None:
+            if embedding:
+                return embedding
+            else:
                 raise NameError
         else: raise NameError
     except NameError as e:
-        print(f'NameError Exception ' + emsgOperation + ' ' + emsgContext + f': ' + repr(e))
+        raise Exception(f'NameError Exception ' + emsgOperation + ' ' + emsgContext + f': ' + repr(e))
     except Exception as e:
-        print(f'Exception ' + emsgOperation + f' ' + emsgContext + f': ' + repr(e) )
-    finally:
-        return embedding
+        raise Exception(f'Exception ' + emsgOperation + f' ' + emsgContext + f': ' + repr(e) )
     
 """ File Management """
 def UploadFiles(client, files, upload_purpose="assistants") -> list:
@@ -246,7 +246,6 @@ def UploadFiles(client, files, upload_purpose="assistants") -> list:
                 emsgOperation = f'iterating the files collection'
                 for file in files:
                     emsgOperation = f"Opening file: {file}"
-                    print(emsgOperation) 
                     opened_file =  open(file, "rb")
                     if opened_file is not None:
                         emsgOperation = f"creating the file in the AzureOpenAI client"
@@ -257,21 +256,21 @@ def UploadFiles(client, files, upload_purpose="assistants") -> list:
                         if response is not None:
                             emsgOperation = f"getting the response.id for file {file}"
                             file_id = response.id
-                            if file_id is not None:
-                                print(f"file: {file} file_id: {file_id}")
+                            if file_id:
                                 file_item = {"file_name": file, "file_id" : file_id}
                                 files_uploaded.append(file_item)
                             else: raise NameError
                         else: raise NameError        
                     else: raise NameError
+                #
+                return files_uploaded
             else: raise NameError
         else: raise NameError
     except NameError as e:
-        print(f'NameError Exception ' + emsgOperation + ' ' + emsgContext + f': ' + repr(e))
+        raise Exception(f'NameError Exception ' + emsgOperation + ' ' + emsgContext + f': ' + repr(e))
     except Exception as e:
-        print(f'Exception ' + emsgOperation + f' ' + emsgContext + f': ' + repr(e))
-    finally:
-        return files_uploaded
+        raise Exception(f'Exception ' + emsgOperation + f' ' + emsgContext + f': ' + repr(e))
+        
 
 def UploadFineTuningFiles(client, files) -> list:
     return UploadFiles(client, files, "fine-tune")
@@ -293,15 +292,18 @@ def GetClientAndUploadFiles(target_folders, purpose="assistants"):
                 if client is not None:     
                     emsgOperation = f'uploading the files'
                     files_uploaded = UploadFiles(client, files, purpose)
+                    if files_uploaded:
+                        return files_uploaded
+                    else:
+                        raise NameError
                 else: raise NameError
             else: raise NameError
         else: raise NameError
     except NameError as e:
-        print(f'NameError Exception ' + emsgOperation + ' ' + emsgContext + f': ' + repr(e))
+        raise Exception(f'NameError Exception ' + emsgOperation + ' ' + emsgContext + f': ' + repr(e))
     except Exception as e:
-        print(f'Exception ' + emsgOperation + f' ' + emsgContext + f': ' + repr(e))
-    finally:
-        return files_uploaded
+        raise Exception(f'Exception ' + emsgOperation + f' ' + emsgContext + f': ' + repr(e))
+        
 
 def GetFileIds(client : AzureOpenAI, purpose = None) -> dict:
     file_ids = None
@@ -315,19 +317,17 @@ def GetFileIds(client : AzureOpenAI, purpose = None) -> dict:
             emsgOperation = f"validating the response"
             if response:
                 file_ids = dict()
-                emsgOperation = f"iterating the list of files"
+                emsgOperation = f"building file_ids by iterating the list of files"
                 for document in response.data:
                     if document.purpose == purpose:
-                        emsgOperation = f"appending the id of a file to the list of files"
                         file_ids[document.filename] = document.id
+                return file_ids
             else: raise NameError
         else: raise NameError
     except NameError as e:
-        print(f'NameError Exception ' + emsgOperation + ' ' + emsgContext + f': ' + repr(e))
+        raise Exception(f'NameError Exception ' + emsgOperation + ' ' + emsgContext + f': ' + repr(e))
     except Exception as e:
-        print(f'Exception ' + emsgOperation + f' ' + emsgContext + f': ' + repr(e) )
-    finally:
-        return file_ids
+        raise Exception(f'Exception ' + emsgOperation + f' ' + emsgContext + f': ' + repr(e) )        
 
 def RetrieveFileContents(client : AzureOpenAI, file_ids : dict) -> str:
     file_contents = {}
@@ -340,7 +340,6 @@ def RetrieveFileContents(client : AzureOpenAI, file_ids : dict) -> str:
             if file_ids is not None:
                 emsgOperation = f"iterating the file_ids dictionary values"
                 for id in file_ids.values():
-                    print(id)
                     emsgOperation = f"getting the content of the current id"
                     response = client.files.content(id)
                     emsgOperation = f"validating the response from getting the content of the current id"
@@ -348,14 +347,13 @@ def RetrieveFileContents(client : AzureOpenAI, file_ids : dict) -> str:
                         emsgOperation = f"getting the text from the response"
                         file_contents[id] = response.text
                     else: raise NameError
+                return file_contents
             else: raise NameError
         else: raise NameError
     except NameError as e:
-        print(f'NameError Exception ' + emsgOperation + ' ' + emsgContext + f': ' + repr(e))
+        raise Exception(f'NameError Exception ' + emsgOperation + ' ' + emsgContext + f': ' + repr(e))
     except Exception as e:
-        print(f'Exception ' + emsgOperation + f' ' + emsgContext + f': ' + repr(e) )
-    finally:
-        return file_contents
+        raise Exception(f'Exception ' + emsgOperation + f' ' + emsgContext + f': ' + repr(e) )
 
 def RetrieveFileContentsCombined(client : AzureOpenAI, file_ids : dict, roles=["system", "user", "assistant"]) -> str:
     file_contents = {}
@@ -368,7 +366,6 @@ def RetrieveFileContentsCombined(client : AzureOpenAI, file_ids : dict, roles=["
             if file_ids is not None:
                 emsgOperation = f"iterating the file_ids dictionary values"
                 for id in file_ids.values():
-                    print(id)
                     emsgOperation = f"getting the content of the current id"
                     response = client.files.content(id)
                     emsgOperation = f"validating the response from getting the content of the current id"
@@ -398,14 +395,13 @@ def RetrieveFileContentsCombined(client : AzureOpenAI, file_ids : dict, roles=["
                         emsgOperation = f"setting the file_contents item"
                         file_contents[id] = response_combined
                     else: raise NameError
+                return file_contents
             else: raise NameError
         else: raise NameError
     except NameError as e:
-        print(f'NameError Exception ' + emsgOperation + ' ' + emsgContext + f': ' + repr(e))
+        raise Exception(f'NameError Exception ' + emsgOperation + ' ' + emsgContext + f': ' + repr(e))
     except Exception as e:
-        print(f'Exception ' + emsgOperation + f' ' + emsgContext + f': ' + repr(e) )
-    finally:
-        return file_contents
+        raise Exception(f'Exception ' + emsgOperation + f' ' + emsgContext + f': ' + repr(e) )
 
 def DeleteFiles(client : AzureOpenAI, file_ids : dict):
     emsgContext = f'in AzureAiClient.DeleteFiles(file_ids)'
@@ -417,15 +413,14 @@ def DeleteFiles(client : AzureOpenAI, file_ids : dict):
             if file_ids is not None:
                 emsgOperation = f"iterating the file_ids dictionary values"
                 for id in file_ids.values():
-                    print(id)
                     emsgOperation = f"deleting the current id"
                     response = client.files.delete(id)
             else: raise NameError
         else: raise NameError
     except NameError as e:
-        print(f'NameError Exception ' + emsgOperation + ' ' + emsgContext + f': ' + repr(e))
+        raise Exception(f'NameError Exception ' + emsgOperation + ' ' + emsgContext + f': ' + repr(e))
     except Exception as e:
-        print(f'Exception ' + emsgOperation + f' ' + emsgContext + f': ' + repr(e) )
+        raise Exception(f'Exception ' + emsgOperation + f' ' + emsgContext + f': ' + repr(e) )
 
 """ Fine Tuning
 def GetClient_FineTuning():
@@ -447,9 +442,9 @@ def GetClient_FineTuning():
         if client is None:
             raise NameError
     except NameError as e:
-        print(f'NameError Exception ' + emsgOperation + ' ' + emsgContext + f': ' + repr(e))
+        raise Exception(f'NameError Exception ' + emsgOperation + ' ' + emsgContext + f': ' + repr(e))
     except Exception as e:
-        print(f'Exception ' + emsgOperation + f' ' + emsgContext + f': ' + repr(e))
+        raise Exception(f'Exception ' + emsgOperation + f' ' + emsgContext + f': ' + repr(e))
     finally:
         return client
     
@@ -469,9 +464,9 @@ def GetFineTuningClientAndUploadFiles(files) -> list:
             else: raise NameError
         else: raise NameError
     except NameError as e:
-        print(f'NameError Exception ' + emsgOperation + ' ' + emsgContext + f': ' + repr(e))
+        raise Exception(f'NameError Exception ' + emsgOperation + ' ' + emsgContext + f': ' + repr(e))
     except Exception as e:
-        print(f'Exception ' + emsgOperation + f' ' + emsgContext + f': ' + repr(e))
+        raise Exception(f'Exception ' + emsgOperation + f' ' + emsgContext + f': ' + repr(e))
     finally:
         return files_uploaded
 
@@ -493,8 +488,7 @@ def RunFineTuningJob(file_id_training: str,
             emsgOperation = f'validating the file_id_validation parameter'
             if file_id_validation is not None: 
                 emsgOperation = f'constructing an AzureOpenAI object as client'
-                client = GetClient_FineTuning()  
-                print(f"client._api_version = " + client._api_version)
+                client = GetClient_FineTuning() 
                 emsgOperation = f'validating the AzureOpenAI object as client'
                 if client is not None:               
                     emsgOperation = f"getting the client.fine_tuning_job object"
@@ -522,9 +516,9 @@ def RunFineTuningJob(file_id_training: str,
             else: raise NameError
         else: raise NameError
     except NameError as e:
-        print(f'NameError Exception ' + emsgOperation + ' ' + emsgContext + f': ' + repr(e) )
+        raise Exception(f'NameError Exception ' + emsgOperation + ' ' + emsgContext + f': ' + repr(e) )
     except Exception as e:
-        print(f'Exception ' + emsgOperation + f' ' + emsgContext + f': ' + repr(e) )
+        raise Exception(f'Exception ' + emsgOperation + f' ' + emsgContext + f': ' + repr(e) )
     finally:
         return job_id
 
@@ -537,7 +531,6 @@ def TrackFineTuningJob(job_id: str) -> str:
         if job_id is not None: 
             emsgOperation = f'constructing an AzureOpenAI object as client'
             client = GetClient_FineTuning()  
-            print(f"client._api_version = " + client._api_version)
             emsgOperation = f'validating the AzureOpenAI object as client'
             if client is not None:               
                 emsgOperation = f"getting the client.fine_tuning_job object"
@@ -571,9 +564,9 @@ def TrackFineTuningJob(job_id: str) -> str:
             else: raise NameError
         else: raise NameError
     except NameError as e:
-        print(f'NameError Exception ' + emsgOperation + ' ' + emsgContext + f': ' + repr(e) )
+        raise Exception(f'NameError Exception ' + emsgOperation + ' ' + emsgContext + f': ' + repr(e) )
     except Exception as e:
-        print(f'Exception ' + emsgOperation + f' ' + emsgContext + f': ' + repr(e) )
+        raise Exception(f'Exception ' + emsgOperation + f' ' + emsgContext + f': ' + repr(e) )
     finally:
         return fine_tuned_model
 
@@ -599,7 +592,6 @@ def DeployFineTunedModel(name_fine_tuned_model, version_fine_tuned_model):
                 dt_now = datetime.datetime.now()
                 str_now = dt_now.strftime("%Y-%m-%d-%H-%M-%S")
                 model_deployment_name = fine_tuning_model + "-" + str_now
-                print(f"model_deployment_name = " + model_deployment_name)
                 #
                 emsgOperation = f"setting up deploy_params"            
                 deploy_params = {"api-version": version_api}
@@ -626,7 +618,6 @@ def DeployFineTunedModel(name_fine_tuned_model, version_fine_tuned_model):
                         + '; params = ' + json_deploy_params\
                         + '; headers = ' + json_deploy_headers\
                         + '; data = ' + json_deploy_data
-                    print(emsgOperation)
                     response = requests.put(request_url, data=json_deploy_data, params=deploy_params, headers=deploy_headers)
                     if response is not None:
                         print(response)
@@ -637,10 +628,10 @@ def DeployFineTunedModel(name_fine_tuned_model, version_fine_tuned_model):
             else: raise NameError
         else: raise NameError
     except NameError as e:
-        print(f'NameError Exception ' + emsgOperation + ' ' + emsgContext  + f": " + repr(e))
+        raise Exception(f'NameError Exception ' + emsgOperation + ' ' + emsgContext  + f": " + repr(e))
         model_deployment_name = None
     except Exception as e:
-        print(f'Exception ' + emsgOperation + f' ' + emsgContext + f": " + repr(e) )
+        raise Exception(f'Exception ' + emsgOperation + f' ' + emsgContext + f": " + repr(e) )
         model_deployment_name = None
     finally:        
         return model_deployment_name
