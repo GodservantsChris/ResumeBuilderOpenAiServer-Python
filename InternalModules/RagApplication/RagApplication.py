@@ -3,6 +3,7 @@ from sklearn.neighbors import NearestNeighbors
 
 import InternalModules.OpenAiEnvironment.AzureAiClient as AzureAiClient
 import InternalModules.OpenAiEnvironment.AzureAiFileManagement as AzureAiFileManagement
+import InternalModules.OpenAiEnvironment.AzureAiEmbeddings as AzureAiEmbeddings
 import InternalModules.FileManagement.FileManagement as FileManagement
 
 def convertDataFilesToEmbeddings():
@@ -96,7 +97,7 @@ def convertContentsToEmbeddings(data_contents):
     for chunk in flattened_df['chunks']:
         number_of_neighbors_to_find = number_of_neighbors_to_find + 1
         #print(f"The current chunk: " + chunk)
-        embeddings_local = AzureAiClient.CreateEmbeddings(chunk)
+        embeddings_local = AzureAiEmbeddings.CreateEmbeddings(chunk)
         embeddings.append(embeddings_local)
     #print(f" ")
 
