@@ -12,7 +12,7 @@ def GetClient() -> AzureOpenAI:
         key = os.getenv("AZURE_OPENAI_API_KEY")
         emsgOperation = f"getting the AZURE_OPENAI_API_VERSION environmental variable"
         version = os.getenv("AZURE_OPENAI_API_VERSION")
-        emsgOperation = f"constructing an AzureOpenAI client object"
+        emsgOperation = f"constructing an AzureOpenAI client object with API version = " + version
         client = AzureOpenAI(
             api_version=version,
             azure_endpoint = endpoint, 
