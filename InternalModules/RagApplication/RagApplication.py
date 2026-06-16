@@ -2,6 +2,7 @@ import pandas as pd
 from sklearn.neighbors import NearestNeighbors
 
 import InternalModules.OpenAiEnvironment.AzureAiClient as AzureAiClient
+import InternalModules.OpenAiEnvironment.AzureAiFileManagement as AzureAiFileManagement
 import InternalModules.FileManagement.FileManagement as FileManagement
 
 def convertDataFilesToEmbeddings():
@@ -25,9 +26,9 @@ def RetrieveFileContents(purpose):
     file_contents = None
     client = AzureAiClient.GetClient()
     if client:
-        file_ids = AzureAiClient.GetFileIds(client, purpose)
+        file_ids = AzureAiFileManagement.GetFileIds(client, purpose)
         if file_ids:
-            file_contents = AzureAiClient.RetrieveFileContentsCombined(client, file_ids)
+            file_contents = AzureAiFileManagement.RetrieveFileContentsCombined(client, file_ids)
     return file_contents
 
 """

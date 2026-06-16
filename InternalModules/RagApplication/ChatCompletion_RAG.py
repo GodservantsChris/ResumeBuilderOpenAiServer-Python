@@ -1,5 +1,6 @@
 import json
-import InternalModules.OpenAiEnvironment.AzureAiClient as AzureAiClient
+import InternalModules.OpenAiEnvironment.AzureAiChat as AzureAiChat
+import InternalModules.OpenAiEnvironment.AzureAiEmbeddings as AzureAiEmbeddings
 import InternalModules.RagApplication.RagApplication as RagApplication
 
 ## Create embeddings from the user input, combine it with the nearest neighbors of the database, and 
@@ -14,7 +15,7 @@ def GetContextUsingInputAndCompleteChat(user_input, nearest_neighbors_estimator,
         if user_input:
             # Convert the question to a query vector
             emsgOperation = f'creating embeddings from user_input'
-            query_vector = AzureAiClient.CreateEmbeddings(user_input)
+            query_vector = AzureAiEmbeddings.CreateEmbeddings(user_input)
             if query_vector and nearest_neighbors_estimator and (context_embeddings_dataframe is not None):
                 # Find the most similar documents
                 #   'indices' - there is an item that is the index in 'chunks' (also 'embeddings') of the nearest neighbor of each embedding
@@ -40,7 +41,7 @@ def GetContextUsingInputAndCompleteChat(user_input, nearest_neighbors_estimator,
             ]
             strMessages = json.dumps(messages)
             emsgOperation = f'getting the client and completing the chat using messages = ' + strMessages
-            response = AzureAiClient.GetClientAndCompleteChat(messages, 0.7, withRawResponse = True)
+            response = AzureAiChat.GetClientAndCompleteChat(messages, 0.7, withRawResponse = True)
             if response:
                 return response    
             else:
