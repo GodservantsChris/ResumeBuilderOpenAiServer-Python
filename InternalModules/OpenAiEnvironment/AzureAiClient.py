@@ -1,6 +1,8 @@
 import os
 from openai import AzureOpenAI
 
+import InternalModules.OpenAiEnvironment.SetEnvVars as SetEnvVars
+
 def GetClient() -> AzureOpenAI:
     emsgContext = f'in Client.GetClient(...)'
     emsgOperation = f''
